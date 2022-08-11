@@ -168,12 +168,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <see langword="true"/>if re-install of app should be performed; otherwise,
         /// <see langword="false"/>.
         /// </param>
-        public void InstallPackage(string packageFilePath, bool reinstall)
+        /// <param name="grantRuntimePermissions">
+        /// <see langword="true"/>if all runtime permissions should be granted; otherwise,
+        /// <see langword="false"/>.
+        /// </param>
+        public void InstallPackage(string packageFilePath, bool reinstall, bool grantRuntimePermissions)
         {
             this.ValidateDevice();
 
             string remoteFilePath = this.SyncPackageToDevice(packageFilePath);
-            this.InstallRemotePackage(remoteFilePath, reinstall);
+            this.InstallRemotePackage(remoteFilePath, reinstall, grantRuntimePermissions);
             this.RemoveRemotePackage(remoteFilePath);
         }
 
@@ -182,14 +186,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="remoteFilePath">absolute file path to package file on device</param>
         /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
-        public void InstallRemotePackage(string remoteFilePath, bool reinstall)
+        /// /// <param name="grantRuntimePermissions">set to <see langword="true"/> if all runtime permissions should be granted</param>
+        public void InstallRemotePackage(string remoteFilePath, bool reinstall, bool grantRuntimePermissions)
         {
             this.ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
             var reinstallSwitch = reinstall ? "-r " : string.Empty;
+            var permissionsSwitch = grantRuntimePermissions ? "-g " : string.Empty;
 
-            string cmd = $"pm install {reinstallSwitch}\"{remoteFilePath}\"";
+            string cmd = $"pm install {permissionsSwitch} {reinstallSwitch}\"{remoteFilePath}\"";
             this.client.ExecuteShellCommand(this.Device, cmd, receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))

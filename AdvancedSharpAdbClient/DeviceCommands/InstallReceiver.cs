@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public class InstallReceiver : MultiLineReceiver
     {
         /// <summary>
-        /// The error message that indicates an unkown error occurred.
+        /// The error message that indicates an unknown error occurred.
         /// </summary>
         public const string UnknownError = "An unknown error occurred.";
 
@@ -82,7 +82,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     else
                     {
                         var m = Regex.Match(line, FailurePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                        this.ErrorMessage = UnknownError;
+                        this.ErrorMessage = UnknownError + "\n" + line;
 
                         this.SuccessMessage = null;
 

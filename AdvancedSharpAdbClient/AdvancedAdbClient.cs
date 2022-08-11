@@ -1128,7 +1128,7 @@ namespace AdvancedSharpAdbClient
 
             if (string.IsNullOrEmpty(device.Serial))
             {
-                throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
+                throw new ArgumentOutOfRangeException(nameof(device), "You must specify a serial number for the device");
             }
         }
     }

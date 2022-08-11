@@ -134,7 +134,7 @@ namespace AdvancedSharpAdbClient
                 }
                 else
                 {
-                    throw new AdbException($"The adb deamon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
+                    throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
                 }
             }
 

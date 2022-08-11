@@ -125,7 +125,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp,            IProgress<int> progress,            CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp,            IProgress<int>? progress,            CancellationToken cancellationToken)
         {
             if (stream == null)
             {
@@ -221,7 +221,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
+        public void Pull(string remoteFilepath, Stream stream, IProgress<int>? progress, CancellationToken cancellationToken)
         {
             if (remoteFilepath == null)
             {

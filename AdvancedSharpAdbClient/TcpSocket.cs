@@ -26,6 +26,8 @@ namespace AdvancedSharpAdbClient
         public TcpSocket()
         {
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this.socket.SendTimeout = 10000;
+            this.socket.ReceiveTimeout = 10000;
         }
 
         /// <inheritdoc/>

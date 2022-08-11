@@ -2,6 +2,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Linq;
+
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
     using Exceptions;
@@ -384,7 +386,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 // only root has access to /data/local/tmp/... not sure how adb does it then...
                 // workitem: 16823
                 // workitem: 19711
-                string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
+                string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, RandomString(16) + ".apk");
 
 #if !NET35 && !NET40
                 this.logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
@@ -409,6 +411,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 this.logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
 #endif
                 throw;
+            }
+            
+            string RandomString(int length)
+            {
+                var random = new Random();
+                const string chars = "ancdefghijlkmnopqrstuvwxyz0123456789";
+                return new string(Enumerable.Repeat(chars, length)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
             }
         }
 

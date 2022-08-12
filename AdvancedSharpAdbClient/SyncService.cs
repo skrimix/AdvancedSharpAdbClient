@@ -125,7 +125,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp,            IProgress<int>? progress,            CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp,            IProgress<int> progress,            CancellationToken cancellationToken)
         {
             if (stream == null)
             {
@@ -221,7 +221,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Pull(string remoteFilepath, Stream stream, IProgress<int>? progress, CancellationToken cancellationToken)
+        public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (remoteFilepath == null)
             {
@@ -357,7 +357,7 @@ namespace AdvancedSharpAdbClient
         private void ReadStatistics(FileStatistics value)
         {
             byte[] statResult = new byte[12];
-            this.Socket.Read(statResult);
+            this.Socket!.Read(statResult);
 
             if (!BitConverter.IsLittleEndian)
             {

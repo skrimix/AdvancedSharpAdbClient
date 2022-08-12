@@ -10,7 +10,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>latest</LangVersion>
-    <Nullable>Enable</Nullable>
+    <Nullable>disable</Nullable>
     <PackageId>AdvancedSharpAdbClient</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/skrimix/AdvancedSharpAdbClient</PackageProjectUrl>

@@ -7,8 +7,8 @@
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat</Authors>
     <Copyright>https://github.com/quamotion/madb</Copyright>
     <Description>AdvancedSharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices.It's improved version of SharpAdbClient.</Description>
-    <PackageVersion>9.9.9</PackageVersion>
-    <Version>9.9.9</Version>
+    <PackageVersion>9.9.10</PackageVersion>
+    <Version>9.9.10</Version>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>latest</LangVersion>

@@ -173,12 +173,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="grantRuntimePermissions">
         /// <see langword="true"/>if all runtime permissions should be granted; otherwise,
         /// <see langword="false"/>.
+        /// <param name="ct">Token to cancel package upload.</param>
         /// </param>
-        public void InstallPackage(string packageFilePath, bool reinstall, bool grantRuntimePermissions)
+        public void InstallPackage(string packageFilePath, bool reinstall, bool grantRuntimePermissions, CancellationToken ct = default)
         {
             this.ValidateDevice();
 
-            string remoteFilePath = this.SyncPackageToDevice(packageFilePath);
+            string remoteFilePath = this.SyncPackageToDevice(packageFilePath, ct);
             this.InstallRemotePackage(remoteFilePath, reinstall, grantRuntimePermissions);
             this.RemoveRemotePackage(remoteFilePath);
         }
@@ -373,9 +374,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Pushes a file to device
         /// </summary>
         /// <param name="localFilePath">the absolute path to file on local host</param>
+        /// <param name="ct">Cancellation token.</param>
         /// <returns>destination path on device for file</returns>
         /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
-        private string SyncPackageToDevice(string localFilePath)
+        private string SyncPackageToDevice(string localFilePath, CancellationToken ct = default)
         {
             this.ValidateDevice();
 
@@ -400,7 +402,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #endif
 
                     // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
-                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
+                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, ct);
                 }
 
                 return remoteFilePath;

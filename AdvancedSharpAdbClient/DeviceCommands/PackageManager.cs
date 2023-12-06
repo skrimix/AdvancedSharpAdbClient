@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public PackageManager(IAdbClient client, DeviceData device, Func<IAdbClient, DeviceData, ISyncService>? syncServiceFactory = null, bool skipInit = false, ILogger<PackageManager>? logger = null, params string[] arguments)
         {
             Device = device ?? throw new ArgumentNullException(nameof(device));
-            Packages = [];
+            Packages = new Dictionary<string, string>();
             AdbClient = client ?? throw new ArgumentNullException(nameof(client));
             Arguments = arguments;
 
@@ -143,15 +143,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Installs an Android application on device.
         /// </summary>
         /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        public virtual void InstallPackage(string packageFilePath, params string[] arguments)
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install</c>.</param>
+        public virtual void InstallPackage(string packageFilePath, in bool isCancelled, params string[] arguments)
         {
             ValidateDevice();
 
             void OnSyncProgressChanged(string? sender, SyncProgressChangedEventArgs args) =>
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(sender is null ? 1 : 0, 1, args.ProgressPercentage));
 
-            string remoteFilePath = SyncPackageToDevice(packageFilePath, OnSyncProgressChanged);
+            string remoteFilePath = SyncPackageToDevice(packageFilePath, OnSyncProgressChanged, isCancelled);
 
             InstallRemotePackage(remoteFilePath, arguments);
 
@@ -166,7 +167,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Installs the application package that was pushed to a temporary location on the device.
         /// </summary>
         /// <param name="remoteFilePath">absolute file path to package file on device.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install</c>.</param>
         public virtual void InstallRemotePackage(string remoteFilePath, params string[] arguments)
         {
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Installing));
@@ -200,8 +201,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, params string[] arguments)
+        public virtual void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, in bool isCancelled, params string[] arguments)
         {
             ValidateDevice();
 
@@ -210,7 +212,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             void OnMainSyncProgressChanged(string? sender, SyncProgressChangedEventArgs args) =>
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(sender is null ? 1 : 0, splitPackageFileCount + 1, args.ProgressPercentage / 2));
 
-            string baseRemoteFilePath = SyncPackageToDevice(basePackageFilePath, OnMainSyncProgressChanged);
+            string baseRemoteFilePath = SyncPackageToDevice(basePackageFilePath, OnMainSyncProgressChanged, isCancelled);
 
             int progressCount = 1;
             Dictionary<string, double> progress = new(splitPackageFileCount);
@@ -235,7 +237,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             string[] splitRemoteFilePaths = new string[splitPackageFileCount];
             foreach (string splitPackageFilePath in splitPackageFilePaths)
             {
-                splitRemoteFilePaths[i++] = SyncPackageToDevice(splitPackageFilePath, OnSplitSyncProgressChanged);
+                splitRemoteFilePaths[i++] = SyncPackageToDevice(splitPackageFilePath, OnSplitSyncProgressChanged, isCancelled);
             }
 
             InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, arguments);
@@ -259,8 +261,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, params string[] arguments)
+        public virtual void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, in bool isCancelled, params string[] arguments)
         {
             ValidateDevice();
 
@@ -289,7 +292,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             string[] splitRemoteFilePaths = new string[splitPackageFileCount];
             foreach (string splitPackageFilePath in splitPackageFilePaths)
             {
-                splitRemoteFilePaths[i++] = SyncPackageToDevice(splitPackageFilePath, OnSyncProgressChanged);
+                splitRemoteFilePaths[i++] = SyncPackageToDevice(splitPackageFilePath, OnSyncProgressChanged, isCancelled);
             }
 
             InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, arguments);
@@ -443,7 +446,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.</param>
         /// <returns>Destination path on device for file.</returns>
         /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
-        protected virtual string SyncPackageToDevice(string localFilePath, Action<string?, SyncProgressChangedEventArgs>? progress)
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        protected virtual string SyncPackageToDevice(string localFilePath, Action<string?, SyncProgressChangedEventArgs>? progress, in bool isCancelled)
         {
             progress?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0, 100));
 
@@ -475,7 +479,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     logger.LogDebug("Uploading file onto device '{0}'", Device.Serial);
 
                     // As C# can't use octal, the octal literal 666 (rw-Permission) is here converted to decimal (438)
-                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, false);
+                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, isCancelled);
 
                     sync.SyncProgressChanged -= OnSyncProgressChanged;
                 }

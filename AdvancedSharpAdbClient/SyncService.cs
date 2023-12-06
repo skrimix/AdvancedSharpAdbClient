@@ -159,8 +159,12 @@ namespace AdvancedSharpAdbClient
             long totalBytesRead = 0;
 
             // look while there is something to read
-            while (!isCancelled)
+            while (true)
             {
+                if (isCancelled)
+                {
+                    throw new OperationCanceledException();
+                }
                 // read up to SYNC_DATA_MAX
 #if HAS_BUFFERS
                 int read = stream.Read(buffer.AsSpan(headerSize, maxDataSize));

@@ -93,7 +93,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 PackageInstallProgressState.PostInstall,
                 PackageInstallProgressState.Finished))
             {
-                manager.InstallPackage("Assets/test.txt");
+                manager.InstallPackage("Assets/test.txt", false);
             }
 
             Assert.Equal(3, adbClient.ReceivedCommands.Count);
@@ -230,7 +230,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 PackageInstallProgressState.PostInstall,
                 PackageInstallProgressState.Finished))
             {
-                manager.InstallMultiplePackage("Assets/test.txt", ["Assets/gapps.txt", "Assets/logcat.bin"]);
+                manager.InstallMultiplePackage("Assets/test.txt", new [] {"Assets/gapps.txt", "Assets/logcat.bin"}, false);
             }
 
             Assert.Equal(9, adbClient.ReceivedCommands.Count);
@@ -260,7 +260,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 PackageInstallProgressState.PostInstall,
                 PackageInstallProgressState.Finished))
             {
-                manager.InstallMultiplePackage(["Assets/gapps.txt", "Assets/logcat.bin"], "com.google.android.gms");
+                manager.InstallMultiplePackage(new [] {"Assets/gapps.txt", "Assets/logcat.bin"}, "com.google.android.gms", false);
             }
 
             Assert.Equal(6, adbClient.ReceivedCommands.Count);

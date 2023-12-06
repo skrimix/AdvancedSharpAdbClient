@@ -1120,6 +1120,17 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:am force-stop {packageName}", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
+        
+        public async Task TcpIpAsync(DeviceData device, int port, CancellationToken cancellationToken = default)
+        {
+            using (var socket = adbSocketFactory(EndPoint))
+            {
+                await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+                await socket.SendAdbRequestAsync($"tcpip:{port}", cancellationToken).ConfigureAwait(false);
+                await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
     }
 }
 #endif

@@ -1219,6 +1219,17 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
             }
         }
+        
+        public void TcpIp(DeviceData device, int port)
+        {
+            using (var socket = adbSocketFactory(EndPoint))
+            {
+                socket.SetDevice(device);
+
+                socket.SendAdbRequest($"tcpip:{port}");
+                socket.ReadAdbResponse();
+            }
+        }
 
 #if NET7_0_OR_GREATER
         [GeneratedRegex("<\\?xml(.?)*")]

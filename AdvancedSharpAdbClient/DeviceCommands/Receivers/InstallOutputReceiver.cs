@@ -104,7 +104,7 @@ namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
                         if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            ErrorMessage = StringExtensions.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
+                            ErrorMessage = StringExtensions.IsNullOrWhiteSpace(msg) ? UnknownError + "\n" + line : msg;
                         }
 
                         Success = false;
@@ -119,7 +119,7 @@ namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
                         if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            ErrorMessage = StringExtensions.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
+                            ErrorMessage = StringExtensions.IsNullOrWhiteSpace(msg) ? UnknownError + "\n" + line : msg;
                         }
 
                         Success = false;

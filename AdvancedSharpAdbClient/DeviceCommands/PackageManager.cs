@@ -154,10 +154,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             string remoteFilePath = SyncPackageToDevice(packageFilePath, OnSyncProgressChanged, isCancelled);
 
-            InstallRemotePackage(remoteFilePath, arguments);
+            try
+            {
+                InstallRemotePackage(remoteFilePath, arguments);
 
-            InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, 1, PackageInstallProgressState.PostInstall));
-            RemoveRemotePackage(remoteFilePath);
+                InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, 1, PackageInstallProgressState.PostInstall));
+            }
+            finally
+            {
+                RemoveRemotePackage(remoteFilePath);
+            }
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(1, 1, PackageInstallProgressState.PostInstall));
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Finished));

@@ -18,7 +18,11 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpSocket"/> class.
         /// </summary>
-        public TcpSocket() => Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        public TcpSocket() => Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+        {
+            SendTimeout = 10000,
+            ReceiveTimeout = 10000
+        };
 
         /// <summary>
         /// The underlying socket that manages the connection.

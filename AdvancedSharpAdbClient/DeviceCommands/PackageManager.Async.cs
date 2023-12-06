@@ -461,7 +461,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 // only root has access to /data/local/tmp/... not sure how adb does it then...
                 // workitem: 16823
                 // workitem: 19711
-                string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
+                string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, RandomString(16) + ".apk");
 
                 logger.LogDebug("Uploading {0} onto device '{1}'", packageFileName, Device.Serial);
 
@@ -498,6 +498,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             finally
             {
                 progress?.Invoke(null, new SyncProgressChangedEventArgs(100, 100));
+            }
+            
+            string RandomString(int length)
+            {
+                var random = new Random();
+                const string chars = "ancdefghijlkmnopqrstuvwxyz0123456789";
+                return new string(Enumerable.Repeat(chars, length)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
             }
         }
 
